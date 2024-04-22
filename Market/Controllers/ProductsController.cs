@@ -3,12 +3,13 @@ using Market.DAL.Repositories;
 using Market.DTO;
 using Market.Enums;
 using Market.Models;
+using Market.UseCases.Products;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Market.Controllers;
 
 [ApiController]
-[Route("[controller]")]
+[Route("v1/products")]
 public sealed class ProductsController : ControllerBase
 {
     public ProductsController()
@@ -18,8 +19,8 @@ public sealed class ProductsController : ControllerBase
 
     private ProductsRepository ProductsRepository { get; }
 
-    [HttpGet("GetProductById")]
-    public async Task<IActionResult> GetProductByIdAsync(Guid productId)
+    [HttpGet("{productId}")]
+    public async Task<IActionResult> GetProductByIdAsync([FromRoute] Guid productId)
     {
         var productResult = await ProductsRepository.GetProductAsync(productId);
         return DbResultIsSuccessful(productResult, out var error)
@@ -27,19 +28,35 @@ public sealed class ProductsController : ControllerBase
             : error;
     }
 
-    [HttpPost("SearchProducts")]
+    [HttpPost("search")]
     public async Task<IActionResult> SearchProductsAsync(
-        string? productName,
-        SortType? sortType,
-        ProductCategory? category,
-        bool ascending = true,
-        int skip = 0,
-        int take = 50)
+        [FromBody] SearchProductDto searchProductDTO)
     {
-        throw new NotImplementedException("Нужно реализовать позже");
+        if (searchProductDTO == null)
+        {
+            return BadRequest();
+        }
+
+        var result = await ProductsRepository.GetProductsAsync(null,
+                                                                productName: searchProductDTO.ProductName,
+                                                                searchProductDTO.Category,
+                                                                skip: searchProductDTO.Skip,
+                                                                take: searchProductDTO.Take);
+        if (!DbResultIsSuccessful(result, out var error))
+            return error;
+
+        IEnumerable<Product> productResult = result.Result;
+
+        if (searchProductDTO.SortType != null)
+        {
+            var sorter = new ProductSorter();
+            productResult = sorter.Sort(productResult, searchProductDTO.SortType, searchProductDTO.Ascending);
+        }
+        
+        return new JsonResult(productResult.Select(ProductDto.FromModel));
     }
 
-    [HttpPost("GetProductsForSeller")]
+    [HttpGet]
     public async Task<IActionResult> GetSellerProductsAsync(
         [FromQuery] Guid sellerId,
         [FromQuery] int skip = 0,
@@ -53,17 +70,17 @@ public sealed class ProductsController : ControllerBase
         return new JsonResult(productDtos);
     }
 
-    [HttpPost("CreateProduct")]
+    [HttpPost]
     public async Task<IActionResult> CreateProductAsync([FromBody] Product product)
     {
         var createResult = await ProductsRepository.CreateProductAsync(product);
 
         return DbResultIsSuccessful(createResult, out var error)
-            ? new StatusCodeResult(StatusCodes.Status205ResetContent)
+            ? new StatusCodeResult(StatusCodes.Status201Created)
             : error;
     }
 
-    [HttpPost("UpdateProductById")]
+    [HttpPut("{productId:Guid}")]
     public async Task<IActionResult> UpdateProductAsync([FromRoute] Guid productId, [FromBody] UpdateProductRequestDto requestInfo)
     {
         var updateResult = await ProductsRepository.UpdateProductAsync(productId, new ProductUpdateInfo
@@ -75,17 +92,17 @@ public sealed class ProductsController : ControllerBase
         });
 
         return DbResultIsSuccessful(updateResult, out var error)
-            ? new StatusCodeResult(StatusCodes.Status404NotFound)
+            ? new StatusCodeResult(StatusCodes.Status204NoContent)
             : error;
     }
 
-    [HttpPost("DeleteProductById")]
-    public async Task<IActionResult> DeleteProductAsync(Guid productId)
+    [HttpDelete("{productId:Guid}")]
+    public async Task<IActionResult> DeleteProductAsync([FromRoute] Guid productId)
     {
         var deleteResult = await ProductsRepository.DeleteProductAsync(productId);
 
         return DbResultIsSuccessful(deleteResult, out var error)
-            ? new StatusCodeResult(StatusCodes.Status405MethodNotAllowed)
+            ? new StatusCodeResult(StatusCodes.Status204NoContent)
             : error;
     }
 
@@ -103,10 +120,10 @@ public sealed class ProductsController : ControllerBase
             case DbResultStatus.Ok:
                 return true;
             case DbResultStatus.NotFound:
-                error = new StatusCodeResult(StatusCodes.Status204NoContent);
+                error = new StatusCodeResult(StatusCodes.Status404NotFound);
                 return false;
             default:
-                error = new StatusCodeResult(StatusCodes.Status102Processing);
+                error = new StatusCodeResult(StatusCodes.Status500InternalServerError);
                 return false;
         }
     }
