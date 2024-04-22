@@ -1,4 +1,5 @@
-﻿using Market.Enums;
+﻿using Market.DTO;
+using Market.Enums;
 using Market.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -100,6 +101,21 @@ internal sealed class ProductsRepository
         {
             Console.WriteLine(e);
             return new DbResult(DbResultStatus.UnknownError);
+        }
+    }
+
+    public async Task<DbResult<DbResult<IReadOnlyList<Product>>>> GetProducts(SearchProductDTO dto)
+    {
+        IQueryable<Product> products =  _context.Products;
+
+        if (dto.ProductName != null)
+        {
+            products.Where(item => item.Name.Equals(dto.ProductName));
+        }
+
+        if (dto.Category != null)
+        {
+            products.Where(item => item.)
         }
     }
 }
