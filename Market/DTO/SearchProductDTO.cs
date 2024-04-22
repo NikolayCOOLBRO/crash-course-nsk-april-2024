@@ -3,7 +3,7 @@
 namespace Market.DTO
 {
 
-    public class SearchProductDTO
+    public class SearchProductDto
     {
         public string? ProductName { get; set; }
         public SortType? SortType { get; set; }

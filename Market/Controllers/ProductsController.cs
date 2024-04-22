@@ -30,7 +30,7 @@ public sealed class ProductsController : ControllerBase
 
     [HttpPost("search")]
     public async Task<IActionResult> SearchProductsAsync(
-        [FromBody] SearchProductDTO searchProductDTO)
+        [FromBody] SearchProductDto searchProductDTO)
     {
         if (searchProductDTO == null)
         {
