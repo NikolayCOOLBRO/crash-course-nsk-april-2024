@@ -3,10 +3,13 @@
 namespace Market.DTO
 {
 
-    public record SearchProductDTO(string? ProductName,
-                                    SortType? SortType,
-                                    ProductCategory? Category,
-                                    bool Ascending = true,
-                                    int Skip = 0,
-                                    int Take = 5);
+    public class SearchProductDTO
+    {
+        public string? ProductName { get; set; }
+        public SortType? SortType { get; set; }
+        public ProductCategory? Category { get; set; }
+        public bool Ascending { get; set; } = true;
+        public int Skip { get; set; } = 0;
+        public int Take { get; set; } = 5;
+    }
 }

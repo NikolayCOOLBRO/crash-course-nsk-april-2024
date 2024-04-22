@@ -3,6 +3,7 @@ using Market.DAL.Repositories;
 using Market.DTO;
 using Market.Enums;
 using Market.Models;
+using Market.UseCases.Products;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Market.Controllers;
@@ -18,8 +19,8 @@ public sealed class ProductsController : ControllerBase
 
     private ProductsRepository ProductsRepository { get; }
 
-    [HttpGet("{id}")]
-    public async Task<IActionResult> GetProductByIdAsync(Guid productId)
+    [HttpGet("{productId}")]
+    public async Task<IActionResult> GetProductByIdAsync([FromRoute] Guid productId)
     {
         var productResult = await ProductsRepository.GetProductAsync(productId);
         return DbResultIsSuccessful(productResult, out var error)
@@ -33,14 +34,26 @@ public sealed class ProductsController : ControllerBase
     {
         if (searchProductDTO == null)
         {
-            throw new NullReferenceException();
+            return BadRequest();
         }
 
-        var result = ProductsRepository.GetProducts();
+        var result = await ProductsRepository.GetProductsAsync(null,
+                                                                productName: searchProductDTO.ProductName,
+                                                                searchProductDTO.Category,
+                                                                skip: searchProductDTO.Skip,
+                                                                take: searchProductDTO.Take);
+        if (!DbResultIsSuccessful(result, out var error))
+            return error;
 
-        // todo
+        IEnumerable<Product> productResult = result.Result;
 
-        return new JsonResult(result);
+        if (searchProductDTO.SortType != null)
+        {
+            var sorter = new ProductSorter();
+            productResult = sorter.Sort(productResult, searchProductDTO.SortType, searchProductDTO.Ascending);
+        }
+        
+        return new JsonResult(productResult.Select(ProductDto.FromModel));
     }
 
     [HttpGet]
@@ -63,11 +76,11 @@ public sealed class ProductsController : ControllerBase
         var createResult = await ProductsRepository.CreateProductAsync(product);
 
         return DbResultIsSuccessful(createResult, out var error)
-            ? new StatusCodeResult(StatusCodes.Status205ResetContent)
+            ? new StatusCodeResult(StatusCodes.Status201Created)
             : error;
     }
 
-    [HttpPut("{productId}")]
+    [HttpPut("{productId:Guid}")]
     public async Task<IActionResult> UpdateProductAsync([FromRoute] Guid productId, [FromBody] UpdateProductRequestDto requestInfo)
     {
         var updateResult = await ProductsRepository.UpdateProductAsync(productId, new ProductUpdateInfo
@@ -79,17 +92,17 @@ public sealed class ProductsController : ControllerBase
         });
 
         return DbResultIsSuccessful(updateResult, out var error)
-            ? new StatusCodeResult(StatusCodes.Status404NotFound)
+            ? new StatusCodeResult(StatusCodes.Status204NoContent)
             : error;
     }
 
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteProductAsync(Guid productId)
+    [HttpDelete("{productId:Guid}")]
+    public async Task<IActionResult> DeleteProductAsync([FromRoute] Guid productId)
     {
         var deleteResult = await ProductsRepository.DeleteProductAsync(productId);
 
         return DbResultIsSuccessful(deleteResult, out var error)
-            ? new StatusCodeResult(StatusCodes.Status405MethodNotAllowed)
+            ? new StatusCodeResult(StatusCodes.Status204NoContent)
             : error;
     }
 
@@ -107,10 +120,10 @@ public sealed class ProductsController : ControllerBase
             case DbResultStatus.Ok:
                 return true;
             case DbResultStatus.NotFound:
-                error = new StatusCodeResult(StatusCodes.Status204NoContent);
+                error = new StatusCodeResult(StatusCodes.Status404NotFound);
                 return false;
             default:
-                error = new StatusCodeResult(StatusCodes.Status102Processing);
+                error = new StatusCodeResult(StatusCodes.Status500InternalServerError);
                 return false;
         }
     }

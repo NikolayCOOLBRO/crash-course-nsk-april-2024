@@ -15,13 +15,25 @@ internal sealed class ProductsRepository
     }
 
     public async Task<DbResult<IReadOnlyCollection<Product>>> GetProductsAsync(
-        Guid? sellerId = null, 
+        Guid? sellerId = null,
+        string? productName = null,
+        ProductCategory? category = null,
         int skip = 0,
         int take = 50)
     {
         IQueryable<Product> query = _context.Products;
 
         // оставил такую реализацию для будущих фильтров
+        if (productName != null)
+        {
+            query = query.Where(item => item.Name.Equals(productName));
+        }
+
+        if (category != null)
+        {
+            query = query.Where(item => item.Category.Equals(category));
+        }
+
         if (sellerId.HasValue)
             query = query.Where(p => p.SellerId == sellerId.Value);
 
@@ -104,18 +116,5 @@ internal sealed class ProductsRepository
         }
     }
 
-    public async Task<DbResult<DbResult<IReadOnlyList<Product>>>> GetProducts(SearchProductDTO dto)
-    {
-        IQueryable<Product> products =  _context.Products;
-
-        if (dto.ProductName != null)
-        {
-            products.Where(item => item.Name.Equals(dto.ProductName));
-        }
-
-        if (dto.Category != null)
-        {
-            products.Where(item => item.)
-        }
-    }
+    public IQueryable<Product> GetProductsQueryable() => _context.Products;
 }
