@@ -4,7 +4,8 @@
     {
         public Guid Id { get; set; }
         public Guid CustomerId { get; set; }
-        public List<Product> Products { get; set; }
+        public Guid SeiledId { get; set; }
+        public Guid ProductId { get; set; }
         public StatusOrder Status { get; set; }
     }
 }

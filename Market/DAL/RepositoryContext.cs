@@ -11,7 +11,7 @@ internal sealed class RepositoryContext : DbContext
     }
 
     public DbSet<Product> Products => Set<Product>();
-    public DbSet<Cart> Cats => Set<Cart>();
+    public DbSet<Cart> Carts => Set<Cart>();
     public DbSet<Order> Orders => Set<Order>();
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -27,7 +27,12 @@ internal sealed class RepositoryContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<Product>().HasData(ProductsInitializer.Initialize());
-        
+        modelBuilder.Entity<Product>().HasData(DataInitializer.InitializeProduct());
+        modelBuilder.Entity<Cart>().HasKey(item => item.CustoerId);
+        modelBuilder.Entity<Cart>().HasData(DataInitializer.InitalizeCart());
+        modelBuilder.Entity<Cart>().Property(c => c.ProductIds).HasColumnType("TEXT")
+            .HasConversion(
+                ids => string.Join(';', ids),
+                s => s.Split(';', StringSplitOptions.RemoveEmptyEntries).Select(Guid.Parse).ToList());
     }
 }

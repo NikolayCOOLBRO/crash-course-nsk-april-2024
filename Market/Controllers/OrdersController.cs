@@ -1,5 +1,7 @@
 ﻿using Market.DAL.Repositories;
 using Market.DTO;
+using Market.Misc;
+using Market.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -7,31 +9,52 @@ namespace Market.Controllers
 {
     [Route("v1/api/orders")]
     [ApiController]
-    public class OrdersController : ControllerBase
+    public sealed class OrdersController : ControllerBase
     {
-        public OrderRepository _orderRepository;
+        private readonly OrderRepository _repository;
 
         public OrdersController()
         {
-            _orderRepository = new OrderRepository();
+            _repository = new OrderRepository();
         }
 
         [HttpPost("search")]
         public async Task<IActionResult> SearchOrder([FromBody] SerachOrderDto getOrderDto)
         {
-            throw new NotImplementedException();
+            var result = await _repository.GetOrdersBySeller(getOrderDto.SellerId, getOrderDto.StatusOrder);
+
+            return DbResultHelper.DbResultIsSuccessful(result, out var error)
+                ? new JsonResult(result)
+                : error;
         }
 
         [HttpPost("create")]
         public async Task<IActionResult> CreateOrder([FromBody] CreateOrderDto dto)
         {
-            throw new NotImplementedException();
+            var order = new Order()
+            {
+                Id = Guid.NewGuid(),
+                CustomerId = dto.CustomerId,
+                ProductId = dto.ProductId,
+                SeiledId = dto.SeildId,
+                Status = StatusOrder.Created
+            };
+
+            var result = await _repository.CreateOrderAsync(order);
+
+            return DbResultHelper.DbResultIsSuccessful(result, out var error)
+                ? Ok()
+                : error;
         }
 
         [HttpPatch("set-status")]
         public async Task<IActionResult> SetStatusOrder([FromBody] SetStatusOrderDto dto)
         {
-            throw new NotImplementedException();
+            var result = await _repository.ChangeOrderStatusAsync(dto.OrderId, dto.StatusOrder);
+
+            return DbResultHelper.DbResultIsSuccessful(result, out var error)
+                ? NoContent()
+                : error;
         }
     }
 }

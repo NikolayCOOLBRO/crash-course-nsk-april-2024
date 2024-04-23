@@ -2,6 +2,7 @@
 using Market.DAL.Repositories;
 using Market.DTO;
 using Market.Enums;
+using Market.Misc;
 using Market.Models;
 using Market.UseCases.Products;
 using Microsoft.AspNetCore.Mvc;
@@ -23,7 +24,7 @@ public sealed class ProductsController : ControllerBase
     public async Task<IActionResult> GetProductByIdAsync([FromRoute] Guid productId)
     {
         var productResult = await ProductsRepository.GetProductAsync(productId);
-        return DbResultIsSuccessful(productResult, out var error)
+        return DbResultHelper.DbResultIsSuccessful(productResult, out var error)
             ? new JsonResult(productResult.Result)
             : error;
     }
@@ -42,7 +43,7 @@ public sealed class ProductsController : ControllerBase
                                                                 searchProductDTO.Category,
                                                                 skip: searchProductDTO.Skip,
                                                                 take: searchProductDTO.Take);
-        if (!DbResultIsSuccessful(result, out var error))
+        if (!DbResultHelper.DbResultIsSuccessful(result, out var error))
             return error;
 
         IEnumerable<Product> productResult = result.Result;
@@ -63,7 +64,7 @@ public sealed class ProductsController : ControllerBase
         [FromQuery] int take = 50)
     {
         var productsResult = await ProductsRepository.GetProductsAsync(sellerId: sellerId, skip: skip, take: take);
-        if (!DbResultIsSuccessful(productsResult, out var error))
+        if (!DbResultHelper.DbResultIsSuccessful(productsResult, out var error))
             return error;
 
         var productDtos = productsResult.Result.Select(ProductDto.FromModel);
@@ -75,7 +76,7 @@ public sealed class ProductsController : ControllerBase
     {
         var createResult = await ProductsRepository.CreateProductAsync(product);
 
-        return DbResultIsSuccessful(createResult, out var error)
+        return DbResultHelper.DbResultIsSuccessful(createResult, out var error)
             ? new CreatedResult("/{productId}", product.Id)
             : error;
     }
@@ -91,7 +92,7 @@ public sealed class ProductsController : ControllerBase
             PriceInRubles = requestInfo.PriceInRubles
         });
 
-        return DbResultIsSuccessful(updateResult, out var error)
+        return DbResultHelper.DbResultIsSuccessful(updateResult, out var error)
             ? new NoContentResult()
             : error;
     }
@@ -101,30 +102,8 @@ public sealed class ProductsController : ControllerBase
     {
         var deleteResult = await ProductsRepository.DeleteProductAsync(productId);
 
-        return DbResultIsSuccessful(deleteResult, out var error)
+        return DbResultHelper.DbResultIsSuccessful(deleteResult, out var error)
             ? new NoContentResult()
             : error;
-    }
-
-    private static bool DbResultIsSuccessful(DbResult dbResult, out IActionResult error) =>
-        DbResultStatusIsSuccessful(dbResult.Status, out error);
-
-    private static bool DbResultIsSuccessful<T>(DbResult<T> dbResult, out IActionResult error) =>
-        DbResultStatusIsSuccessful(dbResult.Status, out error);
-
-    private static bool DbResultStatusIsSuccessful(DbResultStatus status, out IActionResult error)
-    {
-        error = null!;
-        switch (status)
-        {
-            case DbResultStatus.Ok:
-                return true;
-            case DbResultStatus.NotFound:
-                error = new NotFoundResult();
-                return false;
-            default:
-                error = new StatusCodeResult(StatusCodes.Status500InternalServerError);
-                return false;
-        }
     }
 }

@@ -1,9 +1,10 @@
-﻿namespace Market.Models
+﻿using Microsoft.Extensions.Hosting;
+
+namespace Market.Models
 {
     public class Cart
     {
         public Guid CustoerId { get; set; }
-        public Product Product { get; set; }
-        public List<Product> Products { get; set; } = new List<Product>();
+        public List<Guid> ProductIds { get; set; } = new();
     }
 }
