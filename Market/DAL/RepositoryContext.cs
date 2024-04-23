@@ -11,6 +11,8 @@ internal sealed class RepositoryContext : DbContext
     }
 
     public DbSet<Product> Products => Set<Product>();
+    public DbSet<Cart> Cats => Set<Cart>();
+    public DbSet<Order> Orders => Set<Order>();
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -26,5 +28,6 @@ internal sealed class RepositoryContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Product>().HasData(ProductsInitializer.Initialize());
+        
     }
 }

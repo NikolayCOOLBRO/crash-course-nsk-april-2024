@@ -76,7 +76,7 @@ public sealed class ProductsController : ControllerBase
         var createResult = await ProductsRepository.CreateProductAsync(product);
 
         return DbResultIsSuccessful(createResult, out var error)
-            ? new StatusCodeResult(StatusCodes.Status201Created)
+            ? new CreatedResult("/{productId}", product.Id)
             : error;
     }
 
@@ -92,7 +92,7 @@ public sealed class ProductsController : ControllerBase
         });
 
         return DbResultIsSuccessful(updateResult, out var error)
-            ? new StatusCodeResult(StatusCodes.Status204NoContent)
+            ? new NoContentResult()
             : error;
     }
 
@@ -102,7 +102,7 @@ public sealed class ProductsController : ControllerBase
         var deleteResult = await ProductsRepository.DeleteProductAsync(productId);
 
         return DbResultIsSuccessful(deleteResult, out var error)
-            ? new StatusCodeResult(StatusCodes.Status204NoContent)
+            ? new NoContentResult()
             : error;
     }
 
@@ -120,7 +120,7 @@ public sealed class ProductsController : ControllerBase
             case DbResultStatus.Ok:
                 return true;
             case DbResultStatus.NotFound:
-                error = new StatusCodeResult(StatusCodes.Status404NotFound);
+                error = new NotFoundResult();
                 return false;
             default:
                 error = new StatusCodeResult(StatusCodes.Status500InternalServerError);
