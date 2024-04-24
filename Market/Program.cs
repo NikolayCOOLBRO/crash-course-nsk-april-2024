@@ -22,6 +22,7 @@ app.MapControllers();
 //app.UseMiddleware<MyMiddleware>();
 //app.UseMiddleware<MyMiddleware2>();
 
-app.UseMiddleware<AuthMiddleware>();
+//app.UseMiddleware<AuthMiddleware>();
+app.UseMiddleware<ExceptionMiddleware>();
 
 app.Run();

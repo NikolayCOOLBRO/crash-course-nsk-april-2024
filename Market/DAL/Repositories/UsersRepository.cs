@@ -50,9 +50,9 @@ namespace Market.DAL.Repositories
             }
         }
 
-        internal async Task<DbResult<User>> GetUserByLoginPassword()
-        {
+        //internal async Task<DbResult<User>> GetUserByLoginPassword()
+        //{
 
-        }
+        //}
     }
 }

@@ -32,7 +32,7 @@ namespace Market.Services
             return result;
         }
 
-        public async Task<DbResult<bool>> IsUserExists(string login, string password)
+        public async Task<DbResult<User>> IsUserExists(string login, string password)
         {
             throw new NotImplementedException();
         }
