@@ -13,6 +13,7 @@ internal sealed class RepositoryContext : DbContext
     public DbSet<Product> Products => Set<Product>();
     public DbSet<Cart> Carts => Set<Cart>();
     public DbSet<Order> Orders => Set<Order>();
+    public DbSet<User> Users => Set<User>();
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -34,5 +35,7 @@ internal sealed class RepositoryContext : DbContext
             .HasConversion(
                 ids => string.Join(';', ids),
                 s => s.Split(';', StringSplitOptions.RemoveEmptyEntries).Select(Guid.Parse).ToList());
+
+        modelBuilder.Entity<User>().HasData(DataInitializer.InitalizeSuperUser());
     }
 }

@@ -1,3 +1,5 @@
+using Market.Middleware;
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
@@ -16,5 +18,10 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.MapControllers();
+
+//app.UseMiddleware<MyMiddleware>();
+//app.UseMiddleware<MyMiddleware2>();
+
+app.UseMiddleware<AuthMiddleware>();
 
 app.Run();

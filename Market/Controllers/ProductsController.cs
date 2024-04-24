@@ -72,6 +72,7 @@ public sealed class ProductsController : ControllerBase
     }
 
     [HttpPost]
+    []
     public async Task<IActionResult> CreateProductAsync([FromBody] Product product)
     {
         var createResult = await ProductsRepository.CreateProductAsync(product);

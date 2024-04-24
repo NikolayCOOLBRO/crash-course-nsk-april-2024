@@ -34,4 +34,20 @@ internal static class DataInitializer
             }
         };
     }
+
+    public static User[] InitalizeSuperUser()
+    {
+        return new User[]
+        {
+            new User()
+            {
+                Id = Guid.Parse("{37DDFBB6-7C22-4E6D-B6E5-188AA3A52A27}"),
+                Name = "ADMIN",
+                LogIn = "SYS_ADMIN",
+                Password = "root",
+                Salt = "{A24381E9-619A-4E68-BE2D-9E8F45759AFD}",
+                IsSeller = true
+            }
+        };
+    }
 }
