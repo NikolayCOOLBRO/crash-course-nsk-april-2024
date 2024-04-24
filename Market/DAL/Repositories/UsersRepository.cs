@@ -1,4 +1,5 @@
 ﻿
+using Market.Misc;
 using Market.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -50,9 +51,23 @@ namespace Market.DAL.Repositories
             }
         }
 
-        //internal async Task<DbResult<User>> GetUserByLoginPassword()
-        //{
+        internal async Task<DbResult<User>> GetUserByLoginPassword(string logIn, string password)
+        {
+            var userByLogIn = await _context.Users.FirstOrDefaultAsync(item => item.LogIn.Equals(logIn));
 
-        //}
+            if (userByLogIn == null)
+            {
+                return DbResult<User>.NotFound();
+            }
+
+            var hash = PasswordHasher.GeneratePaswordHash(password + userByLogIn.Salt);
+
+            if (!hash.Equals(userByLogIn.Password))
+            {
+                return DbResult<User>.NotFound();
+            }
+
+            return DbResult<User>.Ok(userByLogIn);
+        }
     }
 }

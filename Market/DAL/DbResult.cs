@@ -29,4 +29,9 @@ internal record DbResult<T>(T Result, DbResultStatus Status)
     {
         return new DbResult<T>(result, DbResultStatus.Ok);
     }
+
+    public static DbResult<T> NotFound()
+    {
+        return new DbResult<T>(default!, DbResultStatus.Ok);
+    }
 }

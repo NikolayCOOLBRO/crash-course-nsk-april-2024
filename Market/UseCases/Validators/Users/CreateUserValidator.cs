@@ -9,7 +9,7 @@ namespace Market.UseCases.Validators.Users
         public CreateUserValidator() 
         {
             RuleFor(x => x.Name).NotEmpty().NotNull().MinimumLength(2);
-            RuleFor(x => x.Password).NotEmpty().NotNull().Matches(new Regex("^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$"));
+            RuleFor(x => x.Password).NotEmpty().NotNull().MinimumLength(8);
             RuleFor(x => x.Login).NotEmpty().NotNull().MinimumLength(2);
         }
     }

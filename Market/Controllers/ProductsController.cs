@@ -2,6 +2,7 @@
 using Market.DAL.Repositories;
 using Market.DTO;
 using Market.Enums;
+using Market.Middleware;
 using Market.Misc;
 using Market.Models;
 using Market.UseCases.Products;
@@ -58,6 +59,7 @@ public sealed class ProductsController : ControllerBase
     }
 
     [HttpGet]
+    [CheckAuthFilter]
     public async Task<IActionResult> GetSellerProductsAsync(
         [FromQuery] Guid sellerId,
         [FromQuery] int skip = 0,
@@ -72,6 +74,7 @@ public sealed class ProductsController : ControllerBase
     }
 
     [HttpPost]
+    [CheckAuthFilter]
     public async Task<IActionResult> CreateProductAsync([FromBody] Product product)
     {
         var createResult = await ProductsRepository.CreateProductAsync(product);
@@ -82,6 +85,7 @@ public sealed class ProductsController : ControllerBase
     }
 
     [HttpPut("{productId:Guid}")]
+    [CheckAuthFilter]
     public async Task<IActionResult> UpdateProductAsync([FromRoute] Guid productId, [FromBody] UpdateProductRequestDto requestInfo)
     {
         var updateResult = await ProductsRepository.UpdateProductAsync(productId, new ProductUpdateInfo
@@ -98,6 +102,7 @@ public sealed class ProductsController : ControllerBase
     }
 
     [HttpDelete("{productId:Guid}")]
+    [CheckAuthFilter]
     public async Task<IActionResult> DeleteProductAsync([FromRoute] Guid productId)
     {
         var deleteResult = await ProductsRepository.DeleteProductAsync(productId);

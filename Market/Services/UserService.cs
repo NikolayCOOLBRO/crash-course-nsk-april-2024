@@ -34,7 +34,9 @@ namespace Market.Services
 
         public async Task<DbResult<User>> IsUserExists(string login, string password)
         {
-            throw new NotImplementedException();
+            var result = await _usersRepository.GetUserByLoginPassword(login, password);
+
+            return result;
         }
 
         public async Task<DbResult> SetUserSeller(Guid userId, bool isSeller)
