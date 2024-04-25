@@ -4,7 +4,7 @@ using Market.Models;
 
 namespace Market.Services
 {
-    internal interface IUserService
+    public interface IUserService
     {
         Task<DbResult> CreateUser(CreateUserDto user);
 

@@ -1,13 +1,14 @@
-﻿using Market.Models;
+﻿using Market.DAL.Interfaces;
+using Market.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Market.DAL.Repositories
 {
-    internal sealed class OrderRepository
+    internal sealed class OrderRepository : IOrderRepository
     {
         private readonly RepositoryContext _context;
 
-        public OrderRepository() 
+        public OrderRepository()
         {
             _context = new RepositoryContext();
         }
@@ -56,6 +57,6 @@ namespace Market.DAL.Repositories
 
             var orders = await query.ToListAsync();
             return DbResult<IReadOnlyCollection<Order>>.Ok(orders);
-        } 
+        }
     }
 }

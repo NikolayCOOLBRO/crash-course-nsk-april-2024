@@ -22,18 +22,18 @@ namespace Market.Controllers
     {
         private readonly IUserService _userService;
 
-        private readonly IValidator<CreateUserDto> _validator;
+        private readonly IValidator<CreateUserDto> _validatorCreateUser;
 
-        public UsersController()
+        public UsersController(IUserService userServices, IValidator<CreateUserDto> validator)
         {
-            _userService = new UserService();
-            _validator = new CreateUserValidator();
+            _userService = userServices;
+            _validatorCreateUser = validator;
         }
 
         [HttpPost]
         public async Task<IActionResult> CreateUser([FromBody] CreateUserDto dto)
         {
-            var validationResult = await _validator.ValidateAsync(dto);
+            var validationResult = await _validatorCreateUser.ValidateAsync(dto);
 
             if (!validationResult.IsValid)
             {

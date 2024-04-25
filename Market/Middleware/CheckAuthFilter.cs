@@ -7,13 +7,20 @@ using System.Text;
 
 namespace Market.Middleware
 {
-    public class CheckAuthFilter : ActionFilterAttribute
+    public class CheckAuthFilter : ActionFilterAttribute, IFilterFactory
     {
-        private readonly IUserService _userService;
+        private IUserService _userService;
 
-        public CheckAuthFilter()
+        public CheckAuthFilter(IUserService userService)
         {
-            _userService = new UserService();
+            _userService = userService;
+        }
+
+        public bool IsReusable => false;
+
+        public IFilterMetadata CreateInstance(IServiceProvider serviceProvider)
+        {
+            return serviceProvider.GetService<CheckAuthFilter>()!;
         }
 
         public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
@@ -27,6 +34,7 @@ namespace Market.Middleware
 
             if (string.IsNullOrEmpty(authHeader.Parameter))
             {
+                context.Result = new StatusCodeResult(401);
                 return;
             }
 

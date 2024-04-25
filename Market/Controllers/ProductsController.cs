@@ -1,4 +1,5 @@
 ﻿using Market.DAL;
+using Market.DAL.Interfaces;
 using Market.DAL.Repositories;
 using Market.DTO;
 using Market.Enums;
@@ -14,17 +15,17 @@ namespace Market.Controllers;
 [Route("v1/products")]
 public sealed class ProductsController : ControllerBase
 {
-    public ProductsController()
-    {
-        ProductsRepository = new ProductsRepository();
-    }
+    private readonly IProductsRepository _productsRepository;
 
-    private ProductsRepository ProductsRepository { get; }
+    public ProductsController(IProductsRepository repository)
+    {
+        _productsRepository = repository;
+    }
 
     [HttpGet("{productId}")]
     public async Task<IActionResult> GetProductByIdAsync([FromRoute] Guid productId)
     {
-        var productResult = await ProductsRepository.GetProductAsync(productId);
+        var productResult = await _productsRepository.GetProductAsync(productId);
         return DbResultHelper.DbResultIsSuccessful(productResult, out var error)
             ? new JsonResult(productResult.Result)
             : error;
@@ -39,7 +40,7 @@ public sealed class ProductsController : ControllerBase
             return BadRequest();
         }
 
-        var result = await ProductsRepository.GetProductsAsync(null,
+        var result = await _productsRepository.GetProductsAsync(null,
                                                                 productName: searchProductDTO.ProductName,
                                                                 searchProductDTO.Category,
                                                                 skip: searchProductDTO.Skip,
@@ -59,13 +60,13 @@ public sealed class ProductsController : ControllerBase
     }
 
     [HttpGet]
-    [CheckAuthFilter]
+    [ServiceFilter(typeof(CheckAuthFilter))]
     public async Task<IActionResult> GetSellerProductsAsync(
         [FromQuery] Guid sellerId,
         [FromQuery] int skip = 0,
         [FromQuery] int take = 50)
     {
-        var productsResult = await ProductsRepository.GetProductsAsync(sellerId: sellerId, skip: skip, take: take);
+        var productsResult = await _productsRepository.GetProductsAsync(sellerId: sellerId, skip: skip, take: take);
         if (!DbResultHelper.DbResultIsSuccessful(productsResult, out var error))
             return error;
 
@@ -74,10 +75,10 @@ public sealed class ProductsController : ControllerBase
     }
 
     [HttpPost]
-    [CheckAuthFilter]
+    [ServiceFilter(typeof(CheckAuthFilter))]
     public async Task<IActionResult> CreateProductAsync([FromBody] Product product)
     {
-        var createResult = await ProductsRepository.CreateProductAsync(product);
+        var createResult = await _productsRepository.CreateProductAsync(product);
 
         return DbResultHelper.DbResultIsSuccessful(createResult, out var error)
             ? new CreatedResult("/{productId}", product.Id)
@@ -85,10 +86,10 @@ public sealed class ProductsController : ControllerBase
     }
 
     [HttpPut("{productId:Guid}")]
-    [CheckAuthFilter]
+    [ServiceFilter(typeof(CheckAuthFilter))]
     public async Task<IActionResult> UpdateProductAsync([FromRoute] Guid productId, [FromBody] UpdateProductRequestDto requestInfo)
     {
-        var updateResult = await ProductsRepository.UpdateProductAsync(productId, new ProductUpdateInfo
+        var updateResult = await _productsRepository.UpdateProductAsync(productId, new ProductUpdateInfo
         {
             Name = requestInfo.Name,
             Description = requestInfo.Description,
@@ -102,10 +103,10 @@ public sealed class ProductsController : ControllerBase
     }
 
     [HttpDelete("{productId:Guid}")]
-    [CheckAuthFilter]
+    [ServiceFilter(typeof(CheckAuthFilter))]
     public async Task<IActionResult> DeleteProductAsync([FromRoute] Guid productId)
     {
-        var deleteResult = await ProductsRepository.DeleteProductAsync(productId);
+        var deleteResult = await _productsRepository.DeleteProductAsync(productId);
 
         return DbResultHelper.DbResultIsSuccessful(deleteResult, out var error)
             ? new NoContentResult()

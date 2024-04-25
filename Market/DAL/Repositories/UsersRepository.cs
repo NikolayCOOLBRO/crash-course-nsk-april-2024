@@ -1,20 +1,21 @@
 ﻿
+using Market.DAL.Interfaces;
 using Market.Misc;
 using Market.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Market.DAL.Repositories
 {
-    internal sealed class UsersRepository
+    internal sealed class UsersRepository : IUsersRepository
     {
-        private readonly RepositoryContext _context;
+        private readonly IRepositoryContext _context;
 
-        public UsersRepository()
+        public UsersRepository(IRepositoryContext context)
         {
-            _context = new RepositoryContext();
+            _context = context;
         }
 
-        internal async Task<DbResult> CreateUserAsync(User user)
+        public async Task<DbResult> CreateUserAsync(User user)
         {
             try
             {
@@ -29,7 +30,7 @@ namespace Market.DAL.Repositories
             }
         }
 
-        internal async Task<DbResult> SetUserIsSeller(Guid customerId, bool isSellers)
+        public async Task<DbResult> SetUserIsSeller(Guid customerId, bool isSellers)
         {
             var user = await _context.Users.FirstOrDefaultAsync(item => item.Id.Equals(customerId));
 
@@ -51,7 +52,7 @@ namespace Market.DAL.Repositories
             }
         }
 
-        internal async Task<DbResult<User>> GetUserByLoginPassword(string logIn, string password)
+        public async Task<DbResult<User>> GetUserByLoginPassword(string logIn, string password)
         {
             var userByLogIn = await _context.Users.FirstOrDefaultAsync(item => item.LogIn.Equals(logIn));
 

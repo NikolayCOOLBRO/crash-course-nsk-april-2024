@@ -1,4 +1,5 @@
-﻿using Market.DAL.Repositories;
+﻿using Market.DAL.Interfaces;
+using Market.DAL.Repositories;
 using Market.DTO;
 using Market.Misc;
 using Market.Models;
@@ -11,11 +12,11 @@ namespace Market.Controllers
     [ApiController]
     public sealed class OrdersController : ControllerBase
     {
-        private readonly OrderRepository _repository;
+        private readonly IOrderRepository _repository;
 
-        public OrdersController()
+        public OrdersController(IOrderRepository repository)
         {
-            _repository = new OrderRepository();
+            _repository = repository;
         }
 
         [HttpPost("search")]

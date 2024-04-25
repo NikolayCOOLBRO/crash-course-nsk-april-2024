@@ -1,23 +1,24 @@
-﻿using Market.Models;
+﻿using Market.DAL.Interfaces;
+using Market.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace Market.DAL.Repositories
 {
-    internal sealed class CartsRepository
+    internal sealed class CartsRepository : ICartsRepository
     {
-        private readonly RepositoryContext _context;
+        private readonly IRepositoryContext _context;
 
-        public CartsRepository()
+        public CartsRepository(IRepositoryContext context)
         {
-            _context = new RepositoryContext();
+            _context = context;
         }
 
         public async Task<DbResult<Cart>> GetCartByIdAsync(Guid customerId)
         {
             var cart = await _context.Carts.FirstOrDefaultAsync(item => item.CustoerId.Equals(customerId));
 
-            return cart != null 
+            return cart != null
                 ? DbResult<Cart>.Of(cart, DbResultStatus.Ok) :
                 DbResult<Cart>.Of(null!, DbResultStatus.NotFound);
         }

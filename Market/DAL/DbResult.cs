@@ -1,6 +1,6 @@
 ﻿namespace Market.DAL;
 
-internal record DbResult(DbResultStatus Status)
+public record DbResult(DbResultStatus Status)
 {
     public static DbResult Of(DbResultStatus dbResultStatus)
     {
@@ -18,7 +18,7 @@ internal record DbResult(DbResultStatus Status)
     }
 }
 
-internal record DbResult<T>(T Result, DbResultStatus Status)
+public record DbResult<T>(T Result, DbResultStatus Status)
 {
     public static DbResult<T> Of(T result, DbResultStatus status)
     {
