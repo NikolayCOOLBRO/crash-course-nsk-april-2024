@@ -2,7 +2,7 @@
 using Market.DTO;
 using Market.Models;
 
-namespace Market.Services
+namespace Market.Services.Users
 {
     public interface IUserService
     {
@@ -11,5 +11,6 @@ namespace Market.Services
         Task<DbResult> SetUserSeller(Guid userId, bool isSeller);
 
         Task<DbResult<User>> IsUserExists(string login, string password);
+
     }
 }

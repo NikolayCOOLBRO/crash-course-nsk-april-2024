@@ -5,7 +5,7 @@ using Market.DTO;
 using Market.Middleware;
 using Market.Misc;
 using Market.Models;
-using Market.Services;
+using Market.Services.Users;
 using Market.UseCases.Exceptions;
 using Market.UseCases.Validators.Users;
 using Microsoft.AspNetCore.Http;
@@ -52,10 +52,10 @@ namespace Market.Controllers
                 throw new InvalidDataRequestException(errorDetails);
             }
 
-            if (_userService.IsUserExists(dto.Login, dto.Password) != null)
-            {
-                return new StatusCodeResult(StatusCodes.Status409Conflict);
-            }
+            //if (_userService.IsUserExists(dto.Login, dto.Password).Result != null)
+            //{
+            //    return new StatusCodeResult(StatusCodes.Status409Conflict);
+            //}
 
             var result = await _userService.CreateUser(dto);
 

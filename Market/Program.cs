@@ -4,7 +4,9 @@ using Market.DAL.Interfaces;
 using Market.DAL.Repositories;
 using Market.DTO;
 using Market.Middleware;
-using Market.Services;
+using Market.Services.Comments;
+using Market.Services.Users;
+using Market.UseCases.Validators.Comments;
 using Market.UseCases.Validators.Users;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -18,10 +20,13 @@ builder.Services.AddDbContext<IRepositoryContext, RepositoryContext>()
                 .AddScoped<ICartsRepository, CartsRepository>()
                 .AddScoped<IUsersRepository, UsersRepository>()
                 .AddScoped<IProductsRepository, ProductsRepository>()
-                .AddScoped<IOrderRepository, OrderRepository>();
+                .AddScoped<IOrderRepository, OrderRepository>()
+                .AddScoped<ICommentRepository, CommentRespotiry>();
 
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<ICommentsService, CommentsService>();
 builder.Services.AddScoped<IValidator<CreateUserDto>, CreateUserValidator>();
+builder.Services.AddScoped<IValidator<CreateCommentDto>, CreateCommentValidator>();
 
 builder.Services.AddScoped<CheckAuthFilter>();
 

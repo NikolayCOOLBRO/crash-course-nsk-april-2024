@@ -5,7 +5,7 @@ using Market.DTO;
 using Market.Misc;
 using Market.Models;
 
-namespace Market.Services
+namespace Market.Services.Users
 {
     public class UserService : IUserService
     {

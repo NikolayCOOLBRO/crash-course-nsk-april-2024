@@ -14,6 +14,7 @@ public sealed class RepositoryContext : DbContext, IRepositoryContext
     public DbSet<Cart> Carts => Set<Cart>();
     public DbSet<Order> Orders => Set<Order>();
     public DbSet<User> Users => Set<User>();
+    public DbSet<CommentAnonym> Comments => Set<CommentAnonym>();
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {

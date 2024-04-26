@@ -6,6 +6,7 @@ using Market.Enums;
 using Market.Middleware;
 using Market.Misc;
 using Market.Models;
+using Market.Services.Comments;
 using Market.UseCases.Products;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,10 +17,12 @@ namespace Market.Controllers;
 public sealed class ProductsController : ControllerBase
 {
     private readonly IProductsRepository _productsRepository;
+    private readonly ICommentsService _commentService;
 
-    public ProductsController(IProductsRepository repository)
+    public ProductsController(IProductsRepository repository, ICommentsService commentsService)
     {
         _productsRepository = repository;
+        _commentService = commentsService;
     }
 
     [HttpGet("{productId}")]
@@ -112,4 +115,43 @@ public sealed class ProductsController : ControllerBase
             ? new NoContentResult()
             : error;
     }
+
+    [HttpGet("{productId:Guid}/comments")]
+    public async Task<IActionResult> GetCommentsByProductId([FromRoute] Guid productId)
+    {
+        var resultFindProduct = await _productsRepository.GetProductAsync(productId);
+
+        if (!DbResultHelper.DbResultIsSuccessful(resultFindProduct, out var error))
+        {
+            return error;
+        }
+
+        var result = await _commentService.GetCommentsByProductId(productId);
+
+        var resultDto = result.Select(GetCommentDto.FromModel);
+
+        return new JsonResult(resultDto);
+    }
+
+    [HttpPost("{productId:Guid}/comments")]
+    public async Task<IActionResult> AddCommentToProduct([FromRoute] Guid productId,
+                                                        [FromBody] CreateCommentDto createCommentDto)
+    {
+        var resultFindProduct = await _productsRepository.GetProductAsync(productId);
+
+        if (!DbResultHelper.DbResultIsSuccessful(resultFindProduct, out var error))
+        {
+            return error;
+        }
+
+        await _commentService.AddAnonymComment(productId, createCommentDto);
+
+        return Ok();
+    }
+
+    //[HttpDelete("{productId:Guid}/comments")]
+    //public async Task<IActionResult> RemoveComment()
+    //{
+
+    //}
 }

@@ -1,5 +1,5 @@
 ﻿using Market.Misc;
-using Market.Services;
+using Market.Services.Users;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using System.Net.Http.Headers;
