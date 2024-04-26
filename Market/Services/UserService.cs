@@ -1,4 +1,5 @@
 ﻿using Market.DAL;
+using Market.DAL.Interfaces;
 using Market.DAL.Repositories;
 using Market.DTO;
 using Market.Misc;
@@ -8,11 +9,11 @@ namespace Market.Services
 {
     internal class UserService : IUserService
     {
-        private readonly UsersRepository _usersRepository;
+        private readonly IUsersRepository _usersRepository;
 
-        public UserService()
+        public UserService(IUsersRepository usersRepository)
         {
-            _usersRepository = new UsersRepository();
+            _usersRepository = usersRepository;
         }
 
         public async Task<DbResult> CreateUser(CreateUserDto dto)

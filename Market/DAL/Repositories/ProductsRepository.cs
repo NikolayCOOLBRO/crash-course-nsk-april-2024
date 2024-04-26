@@ -1,17 +1,18 @@
-﻿using Market.DTO;
+﻿using Market.DAL.Interfaces;
+using Market.DTO;
 using Market.Enums;
 using Market.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Market.DAL.Repositories;
 
-internal sealed class ProductsRepository
+internal sealed class ProductsRepository : IProductsRepository
 {
-    private readonly RepositoryContext _context;
+    private readonly IRepositoryContext _context;
 
-    public ProductsRepository()
+    public ProductsRepository(IRepositoryContext context)
     {
-        _context = new RepositoryContext();
+        _context = context;
     }
 
     public async Task<DbResult<IReadOnlyCollection<Product>>> GetProductsAsync(
@@ -74,13 +75,13 @@ internal sealed class ProductsRepository
         if (productToUpdate is null)
             return new DbResult(DbResultStatus.NotFound);
 
-        if(updateInfo.Name != null)
+        if (updateInfo.Name != null)
             productToUpdate.Name = updateInfo.Name;
-        if(updateInfo.Description != null)
+        if (updateInfo.Description != null)
             productToUpdate.Description = updateInfo.Description;
-        if(updateInfo.Category.HasValue)
+        if (updateInfo.Category.HasValue)
             productToUpdate.Category = updateInfo.Category.Value;
-        if(updateInfo.PriceInRubles.HasValue)
+        if (updateInfo.PriceInRubles.HasValue)
             productToUpdate.PriceInRubles = updateInfo.PriceInRubles.Value;
 
         try

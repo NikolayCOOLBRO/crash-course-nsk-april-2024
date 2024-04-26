@@ -1,4 +1,5 @@
-﻿using Market.DAL.Repositories;
+﻿using Market.DAL.Interfaces;
+using Market.DAL.Repositories;
 using Market.DTO;
 using Market.Misc;
 using Market.Models;
@@ -11,11 +12,11 @@ namespace Market.Controllers
     [Route("v1/customers/{customerId:Guid}/cart")]
     public class CartsController : ControllerBase
     {
-        private CartsRepository _cartsRepository { get; }
+        private readonly ICartsRepository _cartsRepository;
 
-        public CartsController()
+        public CartsController(ICartsRepository repository)
         {
-            _cartsRepository = new CartsRepository();
+            _cartsRepository = repository;
         }
 
         [HttpGet]

@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Market.DAL;
 
-internal sealed class RepositoryContext : DbContext
+public sealed class RepositoryContext : DbContext, IRepositoryContext
 {
     public RepositoryContext()
     {
