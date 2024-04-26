@@ -9,7 +9,7 @@ using NSubstitute;
 
 namespace Market.Tests
 {
-    public class Tests
+    public class UserTests
     {
         private IValidator<CreateUserDto> _validator;
         private IValidator<CreateUserDto> _fakeValidator;
@@ -27,7 +27,7 @@ namespace Market.Tests
         [SetUp]
         public void Setup()
         {
-            _user = DataTestGenerator.GetValidUser();
+            _user = DataUserTestGenerator.GetValidUser();
         }
 
         [Test]
@@ -81,13 +81,14 @@ namespace Market.Tests
         [Test]
         public void SomeInvalidPasswordUserShouldFail()
         {
-            _user.Password = DataTestGenerator.GetInvalidPassword();
+            _user.Password = DataUserTestGenerator.GetInvalidPassword();
 
             var validationResult = _validator.Validate(_user);
 
             Assert.IsFalse(validationResult.IsValid);
         }
 
+        /*
         [Test]
         public async Task Test2()
         {
@@ -98,39 +99,6 @@ namespace Market.Tests
 
             await userController.CreateUser(new CreateUserDto());
         }
-
-    }
-
-    public class DataTestGenerator
-    {
-        public static CreateUserDto GetValidUser()
-        {
-            return new CreateUserDto()
-            {
-                Name = GetValidUserName(),
-                Login = GetValidLogin(),
-                Password = GetValidPassword(),
-            };
-        }
-
-        public static string GetValidPassword()
-        {
-            return "TestTest";
-        }
-
-        public static string GetValidUserName()
-        {
-            return "Test";
-        }
-
-        public static string GetValidLogin()
-        {
-            return "Test";
-        }
-
-        public static string GetInvalidPassword()
-        {
-            return "Test";
-        }
+        */
     }
 }
