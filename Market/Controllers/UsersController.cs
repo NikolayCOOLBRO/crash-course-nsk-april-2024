@@ -52,6 +52,11 @@ namespace Market.Controllers
                 throw new InvalidDataRequestException(errorDetails);
             }
 
+            if (_userService.IsUserExists(dto.Login, dto.Password) != null)
+            {
+                return new StatusCodeResult(StatusCodes.Status409Conflict);
+            }
+
             var result = await _userService.CreateUser(dto);
 
             return DbResultHelper.DbResultIsSuccessful(result, out var error)

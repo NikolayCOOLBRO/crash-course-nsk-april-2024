@@ -1,8 +1,10 @@
 using FluentValidation;
 using FluentValidation.Results;
 using Market.Controllers;
+using Market.DAL;
 using Market.DAL.Interfaces;
 using Market.DTO;
+using Market.Models;
 using Market.Services;
 using Market.UseCases.Validators.Users;
 using NSubstitute;
@@ -88,17 +90,31 @@ namespace Market.Tests
             Assert.IsFalse(validationResult.IsValid);
         }
 
-        /*
+        
         [Test]
         public async Task Test2()
         {
-            var userServices = Substitute.For<IUserService>();
+            var userRepository = Substitute.For<IUsersRepository>();
 
-            var userValidator = Substitute.For<IValidator<CreateUserDto>>();
-            var userController = new UsersController(userServices, userValidator);
+            userRepository.GetUserByLoginPassword(null!, null!).ReturnsForAnyArgs(DbResult<User>.Ok(new User()));
 
-            await userController.CreateUser(new CreateUserDto());
+            var userService = new UserService(userRepository);
+
+            await userService.IsUserExists(null!, null!);
+
+            await userRepository.ReceivedWithAnyArgs(1).GetUserByLoginPassword(null!, null!);
         }
-        */
+
+        [Test]
+        public async Task TestNotSubstute()
+        {
+            var userRepository = new UserRepositoryFake();
+
+            var userService = new UserService(userRepository);
+
+            await userService.IsUserExists(DataUserTestGenerator.GetValidLogin(), DataUserTestGenerator.GetInvalidPassword());
+
+            Assert.AreEqual(1, userRepository.CountGetUser);
+        }
     }
 }
