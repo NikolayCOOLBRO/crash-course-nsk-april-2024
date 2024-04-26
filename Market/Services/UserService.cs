@@ -7,7 +7,7 @@ using Market.Models;
 
 namespace Market.Services
 {
-    internal class UserService : IUserService
+    public class UserService : IUserService
     {
         private readonly IUsersRepository _usersRepository;
 
